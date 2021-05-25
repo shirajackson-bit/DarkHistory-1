@@ -17,7 +17,7 @@ from scipy.interpolate import RegularGridInterpolator
 # Location of all data files. CHANGE THIS FOR DARKHISTORY TO ALWAYS
 # LOOK FOR THESE DATA FILES HERE. 
 
-data_path = '/foo/bar'
+data_path = '/Users/shira/Dropbox/My Mac (Shira’s MacBook Air)/Documents/ResearchUtilities'
 
 # Global variables for data.
 glob_binning_data = None
