@@ -239,6 +239,20 @@ def get_history(
             photoheat_rate_HeI  = photoheat_rate_func[1]
             photoheat_rate_HeII = photoheat_rate_func[2]
 
+if reion_switch:
+
+        if photoheat_GWrate_func is None:
+
+            photoheat_GWrate_HI   = reion.photoheat_GWrate('HI')
+            photoheat_GWrate_HeI  = reion.photoheat_GWrate('HeI')
+            photoheat_GWrate_HeII = reion.photoheat_GWrate('HeII')
+
+        else:
+
+            photoheat_GWrate_HI   = photoheat_GWrate_func[0]
+            photoheat_GWrate_HeI  = photoheat_GWrate_func[1]
+            photoheat_GWrate_HeII = photoheat_GWrate_func[2]       
+
     # Define conversion functions between x and y. 
     def xHII(yHII):
             return 0.5 + 0.5*np.tanh(yHII)
