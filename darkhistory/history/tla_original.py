@@ -469,12 +469,10 @@ def get_history(
                     xHII(yHII), xHeII(yHeII), xHeIII(yHeIII), T_m, rs
                 )
             ) / (3/2 * nH * (1 + chi + xe))
-            
-            GW_rate = 20 * photoheat_total_rate
 
             return 1 / T_m * (
                 adiabatic_cooling_rate + compton_rate 
-                + dm_heating_rate + reion_rate + GW_rate
+                + dm_heating_rate + reion_rate
             )
 
         def dyHII_dz(yHII, yHeII, yHeIII, log_T_m, rs):

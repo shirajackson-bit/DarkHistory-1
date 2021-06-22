@@ -211,6 +211,7 @@ def get_history(
         
     chi = phys.chi
 
+#if reion_switch = True in tla.get_history(), default redshift is 16.1
     if reion_switch:
 
         if photoion_rate_func is None:
@@ -417,8 +418,8 @@ def get_history(
     def tla_reion(rs, var):
         # TLA with photoionization/photoheating reionization model.
         # Returns an array of values for [dT/dz, dyHII/dz,
-        # dyHeII/dz, dyHeIII/dz].
-        # var is the [temperature, xHII, xHeII, xHeIII] inputs.
+        # dyHeII/dz, dyHeIII/dz, dGW/dz].
+        # var is the [temperature, xHII, xHeII, xHeIII, GW] inputs.
 
         inj_rate = _injection_rate(rs)
         nH = phys.nH*rs**3
@@ -438,6 +439,7 @@ def get_history(
             # The reionization rates and the Compton rate
             # are expressed in *energy loss* *per second*.
 
+### TO HACK
             photoheat_total_rate = nH * (
                 xHI * photoheat_rate_HI(rs)
                 + xHeI * photoheat_rate_HeI(rs)
@@ -454,6 +456,8 @@ def get_history(
                 _f_heating(rs, xHI, xHeI, xHeII(yHeII)) * inj_rate
             ) / (3/2 * nH * (1 + chi + xe))
 
+
+###TO HACK (added GW_rate term - this is what I will ultimately double and change later)
             reion_rate = phys.dtdz(rs) * (
                 + photoheat_total_rate
                 + reion.recomb_cooling_rate(
@@ -470,7 +474,7 @@ def get_history(
                 )
             ) / (3/2 * nH * (1 + chi + xe))
             
-            GW_rate = 20 * photoheat_total_rate
+           # GW_rate = phys.dt.dz(rs)*(?????? - this is what we have to figure out in real life)
 
             return 1 / T_m * (
                 adiabatic_cooling_rate + compton_rate 
@@ -643,6 +647,8 @@ def get_history(
     _init_cond[2] = np.arctanh(2/chi * (_init_cond[2] - chi/2))
     _init_cond[3] = np.arctanh(2/chi *(_init_cond[3] - chi/2))
 
+   
+   ## TO HACK??
     if reion_rs is None: 
         if photoion_rate_func is None and xe_reion_func is None:
             # Default Puchwein model value.
