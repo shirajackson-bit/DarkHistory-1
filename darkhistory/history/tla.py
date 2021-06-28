@@ -50,7 +50,7 @@ def get_history(
     DM_process=None, mDM=None, sigmav=None, lifetime=None,
     struct_boost=None, injection_rate=None, 
     reion_switch=False, reion_rs=None,
-    photoion_rate_func=None, photoheat_rate_func=None,
+    photoion_rate_func=None, photoheat_rate_func=None,GWrate_func=None,
     xe_reion_func=None, helium_TLA=False, f_He_ion=None, 
     mxstep = 1000, rtol=1e-4
 ):
@@ -239,19 +239,16 @@ def get_history(
             photoheat_rate_HeI  = photoheat_rate_func[1]
             photoheat_rate_HeII = photoheat_rate_func[2]
 
-if reion_switch:
+	if reion_switch:
 
-        if photoheat_GWrate_func is None:
+        if GWrate_func is None:
 
-            photoheat_GWrate_HI   = reion.photoheat_GWrate('HI')
-            photoheat_GWrate_HeI  = reion.photoheat_GWrate('HeI')
-            photoheat_GWrate_HeII = reion.photoheat_GWrate('HeII')
+			#set new flag          
+           GW_heating = False
 
         else:
 
-            photoheat_GWrate_HI   = photoheat_GWrate_func[0]
-            photoheat_GWrate_HeI  = photoheat_GWrate_func[1]
-            photoheat_GWrate_HeII = photoheat_GWrate_func[2]       
+           GW_heating = True      
 
     # Define conversion functions between x and y. 
     def xHII(yHII):
@@ -427,6 +424,8 @@ if reion_switch:
             dyHeII_dz(yHII, yHeII, yHeIII, log_T_m, rs),
             dyHeIII_dz(yHII, yHeII, yHeIII, log_T_m, rs)
         ]
+		#****CHANGE HERE***
+
 
     def tla_reion(rs, var):
         # TLA with photoionization/photoheating reionization model.
@@ -484,8 +483,15 @@ if reion_switch:
                 )
             ) / (3/2 * nH * (1 + chi + xe))
             
-            GW_rate = 20 * photoheat_total_rate
-
+			#NEW TERM -- WILL BE CHANGED        
+        
+			if GW_heating:
+				GW_rate = 20 * photoheat_total_rate
+			
+			else:
+				GW_rate = 0	
+					
+			
             return 1 / T_m * (
                 adiabatic_cooling_rate + compton_rate 
                 + dm_heating_rate + reion_rate + GW_rate
