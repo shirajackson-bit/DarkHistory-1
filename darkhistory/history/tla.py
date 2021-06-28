@@ -239,20 +239,19 @@ def get_history(
             photoheat_rate_HeI  = photoheat_rate_func[1]
             photoheat_rate_HeII = photoheat_rate_func[2]
 
-	if reion_switch:
-
+    if reion_switch:
+    
         if GWrate_func is None:
-
-			#set new flag          
-           GW_heating = False
-
+        
+            GW_heating = False  #set new flag test
+            
         else:
-
-           GW_heating = True      
+        
+            GW_heating = True
 
     # Define conversion functions between x and y. 
     def xHII(yHII):
-            return 0.5 + 0.5*np.tanh(yHII)
+        return 0.5 + 0.5*np.tanh(yHII)
     def xHeII(yHeII):
         return chi/2 + chi/2*np.tanh(yHeII)
     def xHeIII(yHeIII):
@@ -483,13 +482,12 @@ def get_history(
                 )
             ) / (3/2 * nH * (1 + chi + xe))
             
-			#NEW TERM -- WILL BE CHANGED        
-        
-			if GW_heating:
-				GW_rate = 20 * photoheat_total_rate
-			
-			else:
-				GW_rate = 0	
+			#NEW TERM -- WILL BE CHANGED
+            if GW_heating:
+            #GW_rate = 20 * photoheat_total_rate
+                GW_rate = GWrate_func(rs)
+            else:
+                GW_rate = 0	
 					
 			
             return 1 / T_m * (
