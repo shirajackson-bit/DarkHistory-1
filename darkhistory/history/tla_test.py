@@ -476,10 +476,23 @@ def get_history(
             
            # GW_rate = phys.dt.dz(rs)*(?????? - this is what we have to figure out in real life)
 
+                        #NEW TERM -- WILL BE CHANGED
+   
+            if GW_heating:
+                #GW_rate = 20 * photoheat_total_rate
+    
+                GW_rate = GWrate_func(rs)
+                
+            else:
+                
+                GW_rate = 0
+                    
+            
             return 1 / T_m * (
-                adiabatic_cooling_rate + compton_rate 
+                adiabatic_cooling_rate + compton_rate
                 + dm_heating_rate + reion_rate + GW_rate
             )
+
 
         def dyHII_dz(yHII, yHeII, yHeIII, log_T_m, rs):
 

@@ -239,7 +239,7 @@ def get_history(
             photoheat_rate_HeI  = photoheat_rate_func[1]
             photoheat_rate_HeII = photoheat_rate_func[2]
 
-    if reion_switch:
+    if not reion_switch:
     
         if GWrate_func is None:
         
@@ -275,9 +275,23 @@ def get_history(
 
             # This rate is temperature loss per redshift.
             adiabatic_cooling_rate = 2 * T_m/rs
+            
+            # GW_rate = phys.dt.dz(rs)*(?????? - this is what we have to figure out in real life)
 
+            #NEW TERM -- WILL BE CHANGED
+   
+            if GW_heating:
+                #GW_rate = 20 * photoheat_total_rate
+    
+                GW_rate = GWrate_func(rs)
+                
+            else:
+                
+                GW_rate = 0
 
-            return 1 / T_m * adiabatic_cooling_rate + 1 / T_m * (
+            print(GW_rate)
+
+            return 1 / T_m * adiabatic_cooling_rate + 1/T_m * GW_rate + 1 / T_m * (
                 phys.dtdz(rs)*(
                     compton_cooling_rate(
                         xHII(yHII), xHeII(yHeII), xHeIII(yHeIII), T_m, rs
@@ -296,18 +310,18 @@ def get_history(
                 return 0
             # if yHII > 14. or yHII < -14.:
             #     # Stops the solver from wandering too far.
-            #     return 0    
+            #     return 0
             if xHeII(yHeII) > 0.99*chi and rs > 1500:
                 # This is prior to helium recombination.
                 # Assume H completely ionized.
                 return 0
 
             if helium_TLA and xHII(yHII) > 0.999 and rs > 1500:
-                # Use the Saha value. 
+                # Use the Saha value.
                 return 2 * np.cosh(yHII)**2 * phys.d_xe_Saha_dz(rs, 'HI')
 
             if not helium_TLA and xHII(yHII) > 0.99 and rs > 1500:
-                # Use the Saha value. 
+                # Use the Saha value.
                 return 2 * np.cosh(yHII)**2 * phys.d_xe_Saha_dz(rs, 'HI')
 
 
@@ -317,7 +331,7 @@ def get_history(
             xHeI = chi - xHeII(yHeII) - xHeIII(yHeIII)
 
             return 2 * np.cosh(yHII)**2 * phys.dtdz(rs) * (
-                # Recombination processes. 
+                # Recombination processes.
                 # Boltzmann factor is T_r, agrees with HyREC paper.
                 - phys.peebles_C(xHII(yHII), rs) * (
                     phys.alpha_recomb(T_m, 'HI') * xHII(yHII) * xe * nH
@@ -337,7 +351,7 @@ def get_history(
 
             T_m = np.exp(log_T_m)
 
-            if not helium_TLA: 
+            if not helium_TLA:
 
                 return 0
 
@@ -345,12 +359,12 @@ def get_history(
                 # At this point, leave at 1 - 1e-6
                 return 0
             
-            # Stop the solver from reaching these extremes. 
+            # Stop the solver from reaching these extremes.
             if yHeII > 14 or yHeII < -14:
                 return 0
 
-            # # Use the Saha values at high ionization. 
-            # if xHeII(yHeII) > 0.995*chi: 
+            # # Use the Saha values at high ionization.
+            # if xHeII(yHeII) > 0.995*chi:
 
             #     # print(phys.d_xe_Saha_dz(rs, 'HeI'))
 
@@ -375,8 +389,8 @@ def get_history(
                 xHeII(yHeII) * xe * nH * phys.alpha_recomb(T_m, 'HeI_23s')
             )
             term_ion_triplet = (
-                3*phys.beta_ion(phys.TCMB(rs), 'HeI_23s') 
-                * (chi - xHeII(yHeII)) 
+                3*phys.beta_ion(phys.TCMB(rs), 'HeI_23s')
+                * (chi - xHeII(yHeII))
                 * np.exp(-phys.He_exc_eng['23s']/phys.TCMB(rs))
             )
 
@@ -406,13 +420,13 @@ def get_history(
 
         log_T_m, yHII, yHeII, yHeIII = var[0], var[1], var[2], var[3]
 
-        # print ([rs, 
+        # print ([rs,
         #     dlogT_dz(yHII, yHeII, yHeIII, log_T_m, rs),
         #     dyHII_dz(yHII, yHeII, yHeIII, log_T_m, rs),
         #     dyHeII_dz(yHII, yHeII, yHeIII, log_T_m, rs),
         #     dyHeIII_dz(yHII, yHeII, yHeIII, log_T_m, rs)
         # ])
-        # # print(rs, phys.peebles_C(xHII(yHII), rs))
+        #  print(rs, phys.peebles_C(xHII(yHII), rs))
 
 
         #print(rs, log_T_m, xHII(yHII), xHeII(yHeII), xHeIII(yHeIII))
@@ -423,8 +437,6 @@ def get_history(
             dyHeII_dz(yHII, yHeII, yHeIII, log_T_m, rs),
             dyHeIII_dz(yHII, yHeII, yHeIII, log_T_m, rs)
         ]
-		#****CHANGE HERE***
-
 
     def tla_reion(rs, var):
         # TLA with photoionization/photoheating reionization model.
@@ -482,19 +494,13 @@ def get_history(
                 )
             ) / (3/2 * nH * (1 + chi + xe))
             
-			#NEW TERM -- WILL BE CHANGED
-            if GW_heating:
-            #GW_rate = 20 * photoheat_total_rate
-                GW_rate = GWrate_func(rs)
-            else:
-                GW_rate = 0	
-					
-			
+            
             return 1 / T_m * (
-                adiabatic_cooling_rate + compton_rate 
-                + dm_heating_rate + reion_rate + GW_rate
+                adiabatic_cooling_rate + compton_rate
+                + dm_heating_rate + reion_rate
             )
-
+                
+        
         def dyHII_dz(yHII, yHeII, yHeIII, log_T_m, rs):
 
             T_m = np.exp(log_T_m)
@@ -515,7 +521,7 @@ def get_history(
                     inj_rate / (phys.rydberg * nH)
                 )
                 + (1 - phys.peebles_C(xHII(yHII), rs)) * (
-                    _f_H_exc(rs, xHI, xHeI, xHeII(yHeII)) 
+                    _f_H_exc(rs, xHI, xHeI, xHeII(yHeII))
                     * inj_rate / (phys.lya_eng * nH)
                 )
                 # Reionization rates.
