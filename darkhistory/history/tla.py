@@ -239,15 +239,14 @@ def get_history(
             photoheat_rate_HeI  = photoheat_rate_func[1]
             photoheat_rate_HeII = photoheat_rate_func[2]
 
-    if not reion_switch:
-    
-        if GWrate_func is None:
+
+    if GWrate_func is None:
         
-            GW_heating = False  #set new flag test
+        GW_heating = False  #set new flag test
             
-        else:
+    else:
         
-            GW_heating = True
+        GW_heating = True
 
     # Define conversion functions between x and y. 
     def xHII(yHII):
@@ -289,7 +288,7 @@ def get_history(
                 
                 GW_rate = 0
 
-            print(GW_rate)
+            #print(GW_rate)
 
             return 1 / T_m * adiabatic_cooling_rate + 1/T_m * GW_rate + 1 / T_m * (
                 phys.dtdz(rs)*(
@@ -299,6 +298,8 @@ def get_history(
                     + _f_heating(rs, xHI, xHeI, xHeII(yHeII)) * inj_rate
                 )
             )/ (3/2 * nH * (1 + chi + xe))
+            
+            #(3/2 * nH * (1 + chi + xe)) temp to E conversion
 
 
         def dyHII_dz(yHII, yHeII, yHeIII, log_T_m, rs):
@@ -494,10 +495,19 @@ def get_history(
                 )
             ) / (3/2 * nH * (1 + chi + xe))
             
+            if GW_heating:
+                #GW_rate = 20 * photoheat_total_rate
+    
+                GW_rate = GWrate_func(rs)
+                
+            else:
+                
+                GW_rate = 0
+
             
             return 1 / T_m * (
                 adiabatic_cooling_rate + compton_rate
-                + dm_heating_rate + reion_rate
+                + dm_heating_rate + reion_rate + GW_rate
             )
                 
         
