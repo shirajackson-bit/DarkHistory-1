@@ -290,7 +290,7 @@ def get_history(
 
             #print(GW_rate)
 
-            return 1 / T_m * adiabatic_cooling_rate + 1/T_m * GW_rate + 1 / T_m * (
+            return 1 / T_m * adiabatic_cooling_rate + phys.dtdz(rs)*(1/T_m * GW_rate) + 1 / T_m * (
                 phys.dtdz(rs)*(
                     compton_cooling_rate(
                         xHII(yHII), xHeII(yHeII), xHeIII(yHeIII), T_m, rs
@@ -507,7 +507,7 @@ def get_history(
             
             return 1 / T_m * (
                 adiabatic_cooling_rate + compton_rate
-                + dm_heating_rate + reion_rate + GW_rate
+                + dm_heating_rate + reion_rate + phys.dtdz(rs)*GW_rate
             )
                 
         
